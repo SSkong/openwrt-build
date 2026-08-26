@@ -29,7 +29,7 @@ make clean       # Remove cloned source trees
 │   ├── nand.seed             # SPI-NAND optimized
 │   └── pro.seed              # BPI-R4-PRO variant
 ├── patches/                  # Kernel & package patches
-│   ├── kernel/               # Kernel patches (bbr3, sfe, lrng, etc.)
+│   ├── kernel/               # Kernel patches (bbr3, sfe, networking, etc.)
 │   ├── packages/             # Package-level patches (firewall, miniupnpd)
 │   └── gpt/                  # A/B partition layouts
 ├── tools/                    # Validation & analysis tools

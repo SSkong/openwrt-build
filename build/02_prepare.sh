@@ -488,33 +488,9 @@ if [ "$VARIANT" = "full" ]; then
 
   echo "[PREP] === Section 7: Kernel patches ==="
   cp -rf ../patches/kernel/tcp/* ./target/linux/generic/backport-6.6/ 2>/dev/null || true
-  cp -rf ../patches/kernel/fq/* ./target/linux/generic/backport-6.6/ 2>/dev/null || true
   cp -rf ../patches/kernel/bbr3/* ./target/linux/generic/backport-6.6/ 2>/dev/null || true
   cp -rf ../patches/kernel/perf-cc/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
-  cp -rf ../patches/kernel/arm/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
-  if [ "${BPI_R4_ENABLE_LRNG:-0}" = "1" ]; then
-    cp -rf ../patches/kernel/lrng/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
-    cat >> ./target/linux/generic/config-6.6 <<'LRNG'
-
-# CONFIG_RANDOM_DEFAULT_IMPL is not set
-CONFIG_LRNG=y
-CONFIG_LRNG_DEV_IF=y
-# CONFIG_LRNG_IRQ is not set
-CONFIG_LRNG_JENT=y
-CONFIG_LRNG_CPU=y
-# CONFIG_LRNG_SCHED is not set
-CONFIG_LRNG_SELFTEST=y
-# CONFIG_LRNG_SELFTEST_PANIC is not set
-# CONFIG_LRNG_AIS2031_NTG1_SEEDING_STRATEGY is not set
-LRNG
-  else
-    echo "[PREP] Skipping LRNG kernel patch (not part of validated builder profile)"
-  fi
-
-  cp -rf ../patches/kernel/wg/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
-  cp -rf ../patches/kernel/btf/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
   cp -rf ../patches/kernel/sfe/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
-  cp -rf ../patches/kernel/bcmfullcone/* ./target/linux/generic/hack-6.6/ 2>/dev/null || true
   wget -q https://github.com/torvalds/linux/commit/95d0d094.patch -O target/linux/generic/pending-6.6/999-1-95d0d09.patch 2>/dev/null || true
   wget -q https://github.com/torvalds/linux/commit/1a3e9b7a.patch -O target/linux/generic/pending-6.6/999-2-1a3e9b7.patch 2>/dev/null || true
   wget -q https://github.com/torvalds/linux/commit/7eebd219.patch -O target/linux/generic/pending-6.6/999-3-7eebd21.patch 2>/dev/null || true
@@ -530,18 +506,14 @@ LRNG
   cp -f ../patches/packages/firewall/nftables/*.patch ./package/network/utils/nftables/patches/ 2>/dev/null || true
   mkdir -p package/network/config/firewall4/patches
   find ../patches/packages/firewall/firewall4_patches -maxdepth 1 -type f -name '*.patch' \
-    ! -name '999-01-firewall4-add-fullcone-support.patch' \
-    ! -name '999-02-firewall4-add-bcm-fullconenat-support.patch' \
     -exec cp -f {} ./package/network/config/firewall4/patches/ \; 2>/dev/null || true
-  echo "[PREP] Skipping local firewall4 fullcone patches until the base build is stable"
   (
     cd feeds/luci
     for p in \
-      ../../../patches/packages/firewall/luci/0001-luci-app-firewall-add-nft-fullcone-and-bcm-fullcone-.patch \
+      ../../../patches/packages/firewall/luci/0001-luci-app-firewall-add-nft-fullcone-option.patch \
       ../../../patches/packages/firewall/luci/0002-luci-app-firewall-add-shortcut-fe-option.patch \
       ../../../patches/packages/firewall/luci/0003-luci-app-firewall-add-ipv6-nat-option.patch \
       ../../../patches/packages/firewall/luci/0004-luci-add-firewall-add-custom-nft-rule-support.patch \
-      ../../../patches/packages/firewall/luci/0005-luci-app-firewall-add-natflow-offload-support.patch \
       ../../../patches/packages/firewall/luci/0007-luci-app-firewall-add-fullcone6-option-for-nftables-.patch; do
       [ -f "$p" ] && patch -p1 < "$p" || true
     done
@@ -572,7 +544,6 @@ LRNG
   sed_in_place '/auto_start/d' feeds/luci/applications/luci-app-dockerman/root/etc/uci-defaults/luci-app-dockerman 2>/dev/null || true
   rm -rf ./feeds/luci/collections/luci-lib-docker 2>/dev/null || true
   cp -rf ../docker_lib/collections/luci-lib-docker ./feeds/luci/collections/luci-lib-docker 2>/dev/null || true
-  patch -p1 < ../patches/packages/odhcp6c/1002-odhcp6c-support-dhcpv6-hotplug.patch 2>/dev/null || true
   rm -rf ./package/network/services/odhcpd; cp -rf ../openwrt_ma/package/network/services/odhcpd ./package/network/services/odhcpd 2>/dev/null || true
   rm -rf ./package/network/ipv6/odhcp6c; cp -rf ../openwrt_ma/package/network/ipv6/odhcp6c ./package/network/ipv6/odhcp6c 2>/dev/null || true
 

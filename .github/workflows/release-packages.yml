@@ -43,10 +43,10 @@ jobs:
       ARTIFACT_DIR: artifacts
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Cache OpenWrt downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             openwrt/dl
@@ -61,7 +61,7 @@ jobs:
         run: bash build/ci-build.sh
 
       - name: Upload package repository artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bpi-r4-full-packages
           path: |
@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Download package bundle
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: release-artifacts
           merge-multiple: true
@@ -119,14 +119,17 @@ jobs:
           The bundle preserves generated package indexes and all produced .apk/.ipk files.
           EOF
 
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release-artifacts/* --clobber
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-artifacts/* \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
           else
             draft_flag=""
             if [ "$RELEASE_DRAFT" = "true" ]; then
               draft_flag="--draft"
             fi
             gh release create "$RELEASE_TAG" release-artifacts/* \
+              --repo "$GITHUB_REPOSITORY" \
               --title "$RELEASE_TAG" \
               --notes-file "$notes_file" \
               $draft_flag

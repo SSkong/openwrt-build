@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Workflow YAML parse check
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Parse workflow files
         run: |
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Bash syntax check
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Check build script syntax
         run: |
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Seed file validation
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Validate seed files
         run: |
@@ -107,25 +107,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Patch structure check
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Check patch directories
         run: |
           expected_dirs=(
             patches/kernel/tcp
-            patches/kernel/fq
             patches/kernel/perf-cc
             patches/kernel/bbr3
-            patches/kernel/lrng
-            patches/kernel/arm
-            patches/kernel/wg
-            patches/kernel/btf
             patches/kernel/sfe
-            patches/kernel/bcmfullcone
             patches/kernel/mtk-wifi
             patches/packages/firewall
             patches/packages/miniupnpd
-            patches/packages/odhcp6c
             patches/packages/cgroupfs-mount
             patches/files
             patches/gpt

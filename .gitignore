@@ -38,6 +38,7 @@ __pycache__/
 # Temp
 *.tmp
 *.log
+.worktrees/
 
 # Validation reports
 bpi-r4-validation-report/

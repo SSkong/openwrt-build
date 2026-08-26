@@ -70,7 +70,6 @@ OPENWRT_PKG_REPO="https://github.com/openwrt/packages.git"
 OPENWRT_ADD_REPO="https://github.com/QiuSimons/OpenWrt-Add.git"
 DOCKERMAN_REPO="https://github.com/lisaac/luci-app-dockerman"
 DOCKER_LIB_REPO="https://github.com/lisaac/luci-lib-docker"
-LUCI_THEME_DESIGN_REPO="https://github.com/SAENE/luci-theme-design"
 
 # --- Clone logic -------------------------------------------------------------
 if [ "$VARIANT" = "minimal" ]; then
@@ -120,9 +119,26 @@ if [ "$VARIANT" = "minimal" ]; then
 
 else
   # Full: clone everything
+  if [ ! -d "openwrt/.git" ]; then
+    for dir in dl staging_dir build_dir; do
+      if [ -d "openwrt/$dir" ]; then
+        echo "[CLONE] Backing up openwrt/$dir → _saved_$dir"
+        mv "openwrt/$dir" "./_saved_$dir"
+      fi
+    done
+    rm -rf openwrt
+  fi
+
   clone_repo "$OPENWRT_REPO" "$OPENWRT_TAG" openwrt
   clone_repo "$OPENWRT_REPO" "openwrt-24.10" openwrt_snap
   clone_repo "$BOOTLOADER_REPO" "master" bl-mt798x-dhcpd
+
+  for dir in dl staging_dir build_dir; do
+    if [ -d "./_saved_$dir" ]; then
+      echo "[CLONE] Restoring _saved_$dir → openwrt/$dir"
+      mv "./_saved_$dir" "openwrt/$dir"
+    fi
+  done
 
   # Third-party repos
   clone_repo "$LEDE_REPO" "master" lede &
@@ -131,7 +147,6 @@ else
   clone_repo "$OPENWRT_ADD_REPO" "master" OpenWrt-Add &
   clone_repo "$DOCKERMAN_REPO" "master" dockerman &
   clone_repo "$DOCKER_LIB_REPO" "master" docker_lib &
-  clone_repo "$LUCI_THEME_DESIGN_REPO" "master" luci_theme_design_repo &
   wait
 
   # Merge snap packages
